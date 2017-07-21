@@ -8,8 +8,8 @@ int main (void)
   if (wiringPiSetup () == -1)
     return 1 ;
  
-  pinMode (0, OUTPUT) ;         // aka BCM_GPIO pin 17
+  pinMode (1, OUTPUT) ;         // aka BCM_GPIO pin 17
  
-    digitalWrite(0,1);
+    digitalWrite(1,1);
   return 0 ;
 }
