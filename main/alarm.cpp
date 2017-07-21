@@ -4,6 +4,8 @@
 #include "ping.h"
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
 
 #include <wiringPi.h>
 #include <time.h>
@@ -37,15 +39,15 @@ class AlarmDaemon:public Daemon {
 			this->monitor=true;
 			this->stateon=false;
 			if (wiringPiSetup () < 0) {
-				Log::logger->log("MAIN",ERROR) << "Failed to initialize wiringPi librairies: " << strerror (errno)) << endl;
+				Log::logger->log("MAIN",ERROR) << "Failed to initialize wiringPi librairies: " << strerror (errno) << endl;
 				this->monitor=false;
 			} else {
 				this->lastevent=(int) time(NULL);
 				pinMode (PIR_PIN, INPUT) ; 
 				pinMode (LED_PIN, OUTPUT);
 				digitalWrite(LED_PIN, 0);
-				if ( wiringPiISR (PIR_PIN, INT_EDGE_BOTH, &AlarmDaemon::Intrusion) < 0 ) {
-					Log::logger->log("MAIN",ERROR) << "Unable to setup ISR: " << strerror (errno)) << endl;
+				if ( wiringPiISR (PIR_PIN, INT_EDGE_RISING, &AlarmDaemon::Intrusion) < 0 ) {
+					Log::logger->log("MAIN",ERROR) << "Unable to setup ISR: " << strerror (errno) << endl;
 					this->monitor=false;
 				}
 			}
