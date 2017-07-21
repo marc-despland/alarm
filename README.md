@@ -48,6 +48,10 @@ Device 2C:**:**:**:**:18
 
 ## Build and Install
 
+```
+sudo apt-get install libbluetooth-dev
+```
+
 * To build the project (work fine on raspberri pi with raspbian, and centos)
 
 ```
