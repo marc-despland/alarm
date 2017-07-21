@@ -1,9 +1,0 @@
-4654 DAEMON	 DEBUG	 Having new logger
-4654 DAEMON	 NOTICE	 program is start in user space (not as a daemon)
-4654 MAIN	 NOTICE	 Child daemon started
-4657 DAEMON	 DEBUG	 Having new logger
-4657 DAEMON	 NOTICE	 program is start in user space (not as a daemon)
-4657 MAIN	 NOTICE	 Child daemon started
-4768 DAEMON	 DEBUG	 Having new logger
-4768 DAEMON	 NOTICE	 program is start in user space (not as a daemon)
-4768 MAIN	 NOTICE	 Child daemon started
