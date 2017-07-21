@@ -1,0 +1,29 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          alarm
+# Required-Start:    bluetooth
+# Required-Stop:     motion
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start daemon at boot time
+# Description:       Enable service provided by daemon.
+### END INIT INFO
+
+DAEMON=/opt/alarm/bin/alarm
+CONFIG=/opt/alarm/etc/alarm.conf
+
+case "$1" in
+  start)
+  	$DAEMON -a start -f $CONFIG
+  	rc=$?
+  	;;
+  stop)
+  	$DAEMON -a stop -f $CONFIG
+  	rc=$?
+  	;;
+  *)
+    echo $"Usage: $0 {start|stop}"
+    exit 2
+esac
+
+exit $rc
