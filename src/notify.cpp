@@ -25,7 +25,7 @@ void Notify::notify(int message) {
 
 void *Notify::send(void *message) {
 	Log::logger->log("NOTIFY",DEBUG) << "Notifier thread started " << endl;
-
+	int * type=(int *) message;
 	CURL *curl;
 	CURLcode res;
 	struct curl_slist *list = NULL;
@@ -34,7 +34,7 @@ void *Notify::send(void *message) {
 	if(curl) {
 		string apikey="apikey: "+Notify::ApiKey;
 		list = curl_slist_append(list, apikey.c_str());
-		curl_easy_setopt(curl, CURLOPT_URL, Notify::ApiUrl.c_str(););
+		curl_easy_setopt(curl, CURLOPT_URL, Notify::ApiUrl.c_str());
 		curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 		curl_easy_setopt(curl, CURLOPT_POST, 1L);
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
@@ -45,5 +45,5 @@ void *Notify::send(void *message) {
 		}
 		curl_easy_cleanup(curl);
 	}
-	delete message;
+	delete type;
 }
