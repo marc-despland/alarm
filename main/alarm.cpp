@@ -59,9 +59,9 @@ class AlarmDaemon:public Daemon {
 			while (this->monitor) {
 				int now=(int) time(NULL);
 				if (lastevent+10<now) {
-					if (me->stateon) {
+					if (this->stateon) {
 						digitalWrite(LED_PIN, 0);
-						me->stateon=false;
+						this->stateon=false;
 					}
 				}	
 				delay( 1000 ); 
