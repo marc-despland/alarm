@@ -2,6 +2,7 @@
 #define NOTIFY_H
 using namespace std;
 
+#include <string>
 #define START_INTRUSION 1
 #define STOP_INTRUSION 2
 
