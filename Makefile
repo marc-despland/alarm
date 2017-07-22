@@ -1,9 +1,8 @@
 SHELL = /bin/sh
 CC    = g++
 
-CPPFLAGS       = -g -Wall -Iinclude -std=c++11 -I../wiringPi/wiringPi
+CPPFLAGS       = -g -Wall -Iinclude -std=c++11
 OLDFLAGS	= -std=c++11
-MACFLAGS	= -g -Wall -Iinclude -std=c++11 
 CFLAGS       = $(CPPFLAGS) 
 LDLIBS		 = -lutil -lbluetooth -lwiringPi
 TARGET  = alarm
