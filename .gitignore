@@ -32,3 +32,4 @@
 *.app
 alarm
 alarm.log
+alarm.conf

@@ -9,6 +9,7 @@
 
 #include <wiringPi.h>
 #include <time.h>
+#include "notify.h"
 
 #define LED_PIN 1
 #define PIR_PIN 0
@@ -28,6 +29,8 @@ class AlarmDaemon:public Daemon {
 		bool stateon;
 		AlarmDaemon(string program, string version, string description):Daemon(program, version, description) {
 			try {
+				this->parameters->add("alertkey", "The ApiKey to send sms alert", true, "xx:xx:xx:xx:xx");
+				this->parameters->add("alerturl", "The Url to send sms alert", true, "http://");
 				Log::logger->log("MAIN",NOTICE) << "Adding program parameters descriptions" << endl;
 			} catch(ExistingParameterNameException &e ) {
 				Log::logger->log("MAIN", EMERGENCY) << "Can't create one of the file parameters"<< endl;
@@ -68,6 +71,7 @@ class AlarmDaemon:public Daemon {
 			AlarmDaemon * me=(AlarmDaemon *) Daemon::me;
 			me->lastevent=(int) time(NULL);
 			digitalWrite(LED_PIN, 1);
+			Notify::notify(START_INTRUSION);
 		}	
 };
 
