@@ -39,6 +39,8 @@ class AlarmDaemon:public Daemon {
 
 		void daemon(){
 			Log::logger->log("MAIN",NOTICE) << "Child daemon started" << endl;
+			Notify::ApiKey=this->parameters->get("alertkey")->asString();
+			Notify::ApiUrl=this->parameters->get("alerturl")->asString();
 			this->monitor=true;
 			this->stateon=false;
 			if (wiringPiSetup () < 0) {
@@ -57,7 +59,10 @@ class AlarmDaemon:public Daemon {
 			while (this->monitor) {
 				int now=(int) time(NULL);
 				if (lastevent+10<now) {
-					digitalWrite(LED_PIN, 0);
+					if (me->stateon) {
+						digitalWrite(LED_PIN, 0);
+						me->stateon=false;
+					}
 				}	
 				delay( 1000 ); 
 			}		
@@ -70,8 +75,11 @@ class AlarmDaemon:public Daemon {
 		static void Intrusion(void) {
 			AlarmDaemon * me=(AlarmDaemon *) Daemon::me;
 			me->lastevent=(int) time(NULL);
-			digitalWrite(LED_PIN, 1);
-			Notify::notify(START_INTRUSION);
+			if (!me->stateon) {
+				digitalWrite(LED_PIN, 1);
+				Notify::notify(START_INTRUSION);
+				me->stateon=true;
+			}
 		}	
 };
 
