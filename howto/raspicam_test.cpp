@@ -57,7 +57,8 @@ size_t nFramesCaptured=100;
 void write_JPEG_file (string filename,unsigned char *data,raspicam::RaspiCam &Camera, int quality) {
 
   struct jpeg_compress_struct cinfo;
-
+  unsigned char *mem = NULL;
+  unsigned long mem_size = 0;
   struct jpeg_error_mgr jerr;
   FILE * outfile;
   JSAMPROW row_pointer[1];
@@ -75,7 +76,8 @@ void write_JPEG_file (string filename,unsigned char *data,raspicam::RaspiCam &Ca
     cout << "can't open "<<filename<<endl;
     exit(1);
   }
-  jpeg_stdio_dest(&cinfo, outfile);
+  //jpeg_stdio_dest(&cinfo, outfile);
+  jpeg_mem_dest(&cinfo, &mem, &mem_size);
 
   /* Step 3: set parameters for compression */
 
