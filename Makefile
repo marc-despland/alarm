@@ -4,7 +4,7 @@ CC    = g++
 CPPFLAGS       = -g -Wall -Iinclude -std=c++11
 OLDFLAGS	= -std=c++11
 CFLAGS       = $(CPPFLAGS) 
-LDLIBS		 = -lutil -lbluetooth -lwiringPi -lpthread -lcurl
+LDLIBS		 = -lutil -lbluetooth -lwiringPi -lpthread -lcurl -lraspicam -lstdc++ -ljpeg
 TARGET  = alarm
 SOURCES = $(shell echo src/*.cpp)
 HEADERS = $(shell echo include/*.h)

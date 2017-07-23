@@ -18,7 +18,7 @@ class Capture {
 		static void stop();
 	protected:
 		Capture();
-		void * run(void *params);
+		static void * run(void *params);
 		bool running;
 		static Capture * me;
 		pthread_t thread;

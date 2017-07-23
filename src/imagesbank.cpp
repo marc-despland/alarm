@@ -33,7 +33,7 @@ void ImagesBank::upload(string collection, string filename, unsigned char * buff
 
 	curl = curl_easy_init();
 	if(curl) {
-		string apikey="ApiKey: "+Notify::ApiKey;
+		string apikey="ApiKey: "+ImagesBank::ApiKey;
 		list = curl_slist_append(list, apikey.c_str());
 		string url=ImagesBank::ApiUrl+"/collections/"+collection+"/images";
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());

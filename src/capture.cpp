@@ -2,7 +2,9 @@
 #include "log.h"
 #include "camera.h"
 #include "imagesbank.h"
-#include <iostreams>
+#include <sstream>
+#include <string.h>
+
 
 #define JPEG_QUALITY 80
 #define CAPTURE_INTERVAL 1
@@ -34,7 +36,7 @@ void *Capture::run(void *params) {
 		image_name << "image" << index <<".jpg";
 		buffer=camera->toJpeg(&size,JPEG_QUALITY);
 		try {
-			ImagesBank::upload(collection, image_name.str(), buffer, size) throw (CurlInitException, UploadException);
+			ImagesBank::upload(collection, image_name.str(), buffer, size);
 		} catch(CurlInitException &e) {
 
 		} catch(UploadException &e) {
@@ -48,7 +50,7 @@ void *Capture::run(void *params) {
 
 void Capture::start() throw(CreateThreadException) {
 	if (Capture::me==NULL) Capture::me=new Capture();
-	this->running=true;
+	Capture::me->running=true;
 	if(pthread_create(& Capture::me->thread, NULL, Capture::run, NULL)) {
 		Log::logger->log("CAPTURE",ERROR) << "Can't create notifier thread " << strerror (errno) << endl;
 		throw CreateThreadException();

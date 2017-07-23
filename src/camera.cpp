@@ -1,3 +1,4 @@
+#include "camera.h"
 #include "log.h"
 #include <jpeglib.h>
 
@@ -77,5 +78,5 @@ unsigned char * Camera::toJpeg (unsigned long *mem_size,int quality) {
   jpeg_finish_compress(&cinfo);
  /* Step 7: release JPEG compression object */
   jpeg_destroy_compress(&cinfo);
-
+  return mem;
 }
