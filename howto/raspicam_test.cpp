@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <sys/timeb.h>
 #include <png.h>
-#include "raspicam.h"
+#include <raspicam/raspicam.h>
 #include <jpeglib.h>
 #include <stdio.h>
 
@@ -63,7 +63,7 @@ void write_JPEG_file (string filename,unsigned char *data,raspicam::RaspiCam &Ca
   FILE * outfile;
   JSAMPROW row_pointer[1];
   int row_stride;
-
+  cout << "write_JPEG_file" << endl;
   /* Step 1: allocate and initialize JPEG compression object */
   cinfo.err = jpeg_std_error(&jerr);
   /* Now we can initialize the JPEG compression object. */
@@ -122,7 +122,7 @@ void write_JPEG_file (string filename,unsigned char *data,raspicam::RaspiCam &Ca
   jpeg_finish_compress(&cinfo);
   /* After finish_compress, we can close the output file. */
   fclose(outfile);
-
+  cout << "Buffer size : "<<mem_size<<endl;
   /* Step 7: release JPEG compression object */
 
   /* This is an important step since it will release a good deal of memory. */
