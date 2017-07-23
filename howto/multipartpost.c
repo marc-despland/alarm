@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <curl/curl.h>
- 
+// gcc multipartpost.c -o multipart -lstdc++ -lcurl
 int main(void)
 {
   CURL *curl;
@@ -15,7 +15,7 @@ int main(void)
   static const char *postthis="moo mooo moo moo";
  
 
-ccurl_formadd(&formpost,
+curl_formadd(&formpost,
           &lastptr,
           CURLFORM_COPYNAME, "send",
           CURLFORM_BUFFER, "nowy.jpg",
@@ -25,13 +25,8 @@ ccurl_formadd(&formpost,
 
   curl = curl_easy_init();
   if(curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.1.46");
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postthis);
- 
-    /* if we don't provide POSTFIELDSIZE, libcurl will strlen() by
-       itself */ 
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, (long)strlen(postthis));
- 
+    curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.1.46:8080");
+    curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
     /* Perform the request, res will get the return code */ 
     res = curl_easy_perform(curl);
     /* Check for errors */ 
