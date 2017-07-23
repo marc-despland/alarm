@@ -12,6 +12,7 @@
 #include "notify.h"
 #include "camera.h"
 #include "imagesbank.h"
+#include "capture.h"
 
 #define LED_PIN 1
 #define PIR_PIN 0
@@ -67,6 +68,7 @@ class AlarmDaemon:public Daemon {
 				if (lastevent+10<now) {
 					if (this->stateon) {
 						digitalWrite(LED_PIN, 0);
+						Capture::stop();
 						this->stateon=false;
 					}
 				}	
@@ -84,6 +86,7 @@ class AlarmDaemon:public Daemon {
 			if (!me->stateon) {
 				digitalWrite(LED_PIN, 1);
 				Notify::notify(START_INTRUSION);
+				Capture::start();
 				me->stateon=true;
 			}
 		}	
