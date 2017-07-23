@@ -4,7 +4,7 @@
 #include "imagesbank.h"
 #include <sstream>
 #include <string.h>
-
+#include <unistd.h>
 
 #define JPEG_QUALITY 80
 #define CAPTURE_INTERVAL 1
@@ -43,6 +43,7 @@ void *Capture::run(void *params) {
 			
 		}
 		index++;
+		sleep(CAPTURE_INTERVAL);
 	}
 	camera->release();
 	Log::logger->log("CAPTURE",DEBUG) << "Capture finished" << endl;

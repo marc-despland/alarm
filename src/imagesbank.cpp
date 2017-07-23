@@ -25,7 +25,7 @@ void ImagesBank::upload(string collection, string filename, unsigned char * buff
 	struct curl_slist *list = NULL;
 	curl_formadd(&formpost,
 		&lastptr,
-		CURLFORM_COPYNAME, "send",
+		CURLFORM_COPYNAME, "image",
 		CURLFORM_BUFFER, filename.c_str(),
 		CURLFORM_BUFFERPTR, buffer,
 		CURLFORM_BUFFERLENGTH, size,
@@ -35,6 +35,7 @@ void ImagesBank::upload(string collection, string filename, unsigned char * buff
 	if(curl) {
 		string apikey="ApiKey: "+ImagesBank::ApiKey;
 		list = curl_slist_append(list, apikey.c_str());
+		list = curl_slist_append(list, "Expect:");
 		string url=ImagesBank::ApiUrl+"/collections/"+collection+"/images";
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
