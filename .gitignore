@@ -33,3 +33,8 @@
 alarm
 alarm.log
 alarm.conf
+interruptpi
+readpin
+pinon
+pinoff
+rpicamtest
