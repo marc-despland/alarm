@@ -10,6 +10,8 @@
 #include <wiringPi.h>
 #include <time.h>
 #include "notify.h"
+#include "camera.h"
+#include "imagesbank.h"
 
 #define LED_PIN 1
 #define PIR_PIN 0
@@ -31,6 +33,8 @@ class AlarmDaemon:public Daemon {
 			try {
 				this->parameters->add("alertkey", "The ApiKey to send sms alert", true, "xx:xx:xx:xx:xx");
 				this->parameters->add("alerturl", "The Url to send sms alert", true, "http://");
+				this->parameters->add("bankkey", "The ApiKey for ImagesBank service", true, "xx:xx:xx:xx:xx");
+				this->parameters->add("bankurl", "The Url of ImagesBank service", true, "http://");
 				Log::logger->log("MAIN",NOTICE) << "Adding program parameters descriptions" << endl;
 			} catch(ExistingParameterNameException &e ) {
 				Log::logger->log("MAIN", EMERGENCY) << "Can't create one of the file parameters"<< endl;
@@ -41,6 +45,8 @@ class AlarmDaemon:public Daemon {
 			Log::logger->log("MAIN",NOTICE) << "Child daemon started" << endl;
 			Notify::ApiKey=this->parameters->get("alertkey")->asString();
 			Notify::ApiUrl=this->parameters->get("alerturl")->asString();
+			ImagesBank::ApiKey=this->parameters->get("bankkey")->asString();
+			ImagesBank::ApiUrl=this->parameters->get("bankurl")->asString();
 			this->monitor=true;
 			this->stateon=false;
 			if (wiringPiSetup () < 0) {
