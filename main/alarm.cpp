@@ -161,6 +161,11 @@ class AlarmDaemon:public Daemon {
 			RequestContext * context=(RequestContext *) params;
 			char * buffer=NULL;
 			unsigned long size=0;
+			AlarmDaemon * me=(AlarmDaemon *) Daemon::me;
+			if (!me->stateon) {
+				digitalWrite(LED_PIN, 1);
+				usleep(200000);
+			}
 			Camera * camera=new Camera();
 			try {
 				camera->init();
@@ -182,7 +187,10 @@ class AlarmDaemon:public Daemon {
 				context->response->setStatusMessage("Internal Server Error");
 				context->response->setContentType("application/json");
 				context->response->setBody("{\"message\": \"Can't initialize the Camera\"}", 42);
-			}	
+			}
+			if (!me->stateon) {
+				digitalWrite(LED_PIN, 0);
+			}
 			context->response->send();
 			delete camera;
 			delete context;
