@@ -39,4 +39,5 @@ pinon
 pinoff
 rpicamtest
 multipart
-
+core*
+vgcore*

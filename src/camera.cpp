@@ -2,19 +2,22 @@
 #include "log.h"
 #include <jpeglib.h>
 
+pthread_mutex_t Camera::lock;
 
 Camera::Camera() {
+  pthread_mutex_lock (& Camera::lock);
 	this->camera_init=false;
 	this->data=NULL;
 }
 
-void Camera::release() {
+Camera::~Camera() {
 	if (this->camera_init) {
 		delete[] data;
 		this->camera.release();
 		this->camera_init=false;
 		this->data=NULL;
 	}
+  pthread_mutex_unlock (& Camera::lock);
 }
 
 void Camera::init() throw (CameraOpenException){

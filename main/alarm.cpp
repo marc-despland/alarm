@@ -13,9 +13,26 @@
 #include "camera.h"
 #include "imagesbank.h"
 #include "capture.h"
+#include "httpserver.h"
 
 #define LED_PIN 1
 #define PIR_PIN 0
+
+#define JPEG_QUALITY 80
+
+class RequestContext {
+	public:
+		RequestContext(HttpRequest * request, HttpResponse * response) {
+			this->request=request;
+			this->response=response;
+		};
+		~RequestContext() {
+			delete this->request;
+			delete this->response;
+		}
+		HttpRequest * request;
+		HttpResponse * response;
+};
 
 class AlarmDaemon:public Daemon {
 	public:
@@ -32,6 +49,8 @@ class AlarmDaemon:public Daemon {
 		bool stateon;
 		AlarmDaemon(string program, string version, string description):Daemon(program, version, description) {
 			try {
+				this->parameters->add("httpport", "The HTTP for the REST API", true, "8080");
+				this->parameters->add("apikey", "The ApiKey use to request the REST API", true, "xxxxxxxxxxxxxxxxxxxxx");
 				this->parameters->add("alertkey", "The ApiKey to send sms alert", true, "xx:xx:xx:xx:xx");
 				this->parameters->add("alerturl", "The Url to send sms alert", true, "http://");
 				this->parameters->add("bankkey", "The ApiKey for ImagesBank service", true, "xx:xx:xx:xx:xx");
@@ -89,7 +108,88 @@ class AlarmDaemon:public Daemon {
 				Capture::start();
 				me->stateon=true;
 			}
-		}	
+		}
+		void start_httpd() {
+			pthread_t httpd_thread;
+			if(pthread_create(&httpd_thread, NULL, AlarmDaemon::httpd, this)) {
+				Log::logger->log("MAIN",ERROR) << "Can't create httpd thread " << strerror (errno) << endl;
+			} else {
+				if(pthread_detach(httpd_thread)) {
+					Log::logger->log("MAIN",ERROR) << "Can't detach httpd thread " << strerror (errno) << endl;
+				}
+			}
+		}
+
+		static void * httpd(void *daemon) {
+			AlarmDaemon * me=(AlarmDaemon *) daemon;
+			Log::logger->log("MAIN",DEBUG) << "Sarting HTTPD server" <<endl;
+			HttpServer * server=new HttpServer(me->parameters->get("httpport")->asInt(),20, true);
+			server->add(HTTP_GET, "/api/image", captureLiveImage);
+			server->run();
+			return NULL;
+		}
+
+		static int captureLiveImage(HttpRequest * request, HttpResponse * response) {
+			string apikey="";
+			try {
+				apikey=request->getHeader("apikey");
+			} catch(std::out_of_range &e) {}
+			AlarmDaemon * me=(AlarmDaemon *) Daemon::me;
+			if (apikey!=me->parameters->get("apikey")->asString()) {
+				Log::logger->log("MAIN", DEBUG) << "Forbbiden request" <<endl;
+				response->setStatusCode(403);
+				response->setStatusMessage("FORBIDDEN");
+				response->send();
+				delete response;
+				delete request;
+			} else {
+				pthread_t httpd_thread;
+				RequestContext * context=new RequestContext(request, response);
+				if(pthread_create(&httpd_thread, NULL, AlarmDaemon::sendCapturedImage, context)) {
+					Log::logger->log("MAIN",ERROR) << "Can't create send image thread " << strerror (errno) << endl;
+				} else {
+					if(pthread_detach(httpd_thread)) {
+						Log::logger->log("MAIN",ERROR) << "Can't detach send image thread " << strerror (errno) << endl;
+					}
+				}
+			}
+			return 0;
+		}
+
+		static void * sendCapturedImage(void * params) {
+			RequestContext * context=(RequestContext *) params;
+			char * buffer=NULL;
+			unsigned long size=0;
+			Camera * camera=new Camera();
+			try {
+				camera->init();
+				try {
+					camera->capture();
+					buffer=(char *) camera->toJpeg(&size,JPEG_QUALITY);
+					context->response->setStatusCode(200);
+					context->response->setStatusMessage("OK");
+					context->response->setContentType("image/jpeg");
+					context->response->setBody(buffer, size);
+				} catch(CameraOpenException &e) {
+					context->response->setStatusCode(500);
+					context->response->setStatusMessage("Internal Server Error");
+					context->response->setContentType("application/json");
+					context->response->setBody("{\"message\": \"Can't capture the image\"}", 38);
+				}
+			}catch(CameraOpenException &e) {
+				context->response->setStatusCode(500);
+				context->response->setStatusMessage("Internal Server Error");
+				context->response->setContentType("application/json");
+				context->response->setBody("{\"message\": \"Can't initialize the Camera\"}", 42);
+			}	
+			context->response->send();
+			delete camera;
+			delete context;
+			if (size>0) {
+				free(buffer);
+			}
+			return NULL;
+		}
 };
 
 

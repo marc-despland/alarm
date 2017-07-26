@@ -4,7 +4,7 @@ CC    = g++
 CPPFLAGS       = -g -Wall -Iinclude -std=c++11
 OLDFLAGS	= -std=c++11
 CFLAGS       = $(CPPFLAGS) 
-LDLIBS		 = -lutil -lbluetooth -lwiringPi -lpthread -lcurl -lraspicam -lstdc++ -ljpeg
+LDLIBS		 = -lutil -lbluetooth -lwiringPi -lpthread -lcurl -lraspicam -lstdc++ -ljpeg -lhttp_parser
 TARGET  = alarm
 SOURCES = $(shell echo src/*.cpp)
 HEADERS = $(shell echo include/*.h)

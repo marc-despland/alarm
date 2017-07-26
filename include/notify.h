@@ -13,6 +13,6 @@ class Notify {
 		static string ApiUrl;
 		static void notify(int message);
 	protected:
-		static void *send(void *message);
+		static void * send(void *message);
 };
 #endif

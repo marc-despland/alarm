@@ -45,7 +45,7 @@ void *Capture::run(void *params) {
 		index++;
 		sleep(CAPTURE_INTERVAL);
 	}
-	camera->release();
+	delete camera;
 	Log::logger->log("CAPTURE",DEBUG) << "Capture finished" << endl;
 }
 

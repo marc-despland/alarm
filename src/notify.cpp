@@ -23,7 +23,7 @@ void Notify::notify(int message) {
 }
 
 
-void *Notify::send(void *message) {
+void * Notify::send(void *message) {
 	Log::logger->log("NOTIFY",DEBUG) << "Notifier thread started " << endl;
 	int * type=(int *) message;
 	CURL *curl;
@@ -47,4 +47,5 @@ void *Notify::send(void *message) {
 		curl_easy_cleanup(curl);
 	}
 	delete type;
+	return NULL;
 }
