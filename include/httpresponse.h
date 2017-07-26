@@ -17,6 +17,7 @@ class HttpResponse {
 		void setBody(char *buffer, unsigned long size);
 		void send();
 	protected:
+		int write(const char * buffer, unsigned long size);
 		string contentType;
 		unsigned int statusCode;
 		string statusMessage;

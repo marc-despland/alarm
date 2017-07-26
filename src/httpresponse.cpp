@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "log.h"
-
+#include <sys/select.h>
 
 //144
 
@@ -55,7 +55,7 @@ void HttpResponse::send() {
     	headers << it->first << ": " << it->second << "\r\n";
     }
 	headers << "\r\n";
-	int ws=write(this->socket, headers.str().c_str(), headers.str().length());
+	int ws=this->write(headers.str().c_str(), headers.str().length());
 	if (ws<0) {
 		Log::logger->log("HTTPRESPONSE",ERROR) << "Can't write on socket: " << this->socket <<endl;
 	} else {
@@ -64,7 +64,7 @@ void HttpResponse::send() {
 		Log::logger->log("HTTPRESPONSE",DEBUG) << "Starting writing body." << endl;
 		while (length>0) {
 			Log::logger->log("HTTPRESPONSE",DEBUG) << "We have to write " << length << " bytes" <<endl;
-			ws=write(this->socket, ptr, length);
+			ws=this->write(ptr, length);
 			Log::logger->log("HTTPRESPONSE",DEBUG) << "We have writen " << ws << " bytes" <<endl;
 			if (ws<0) {
 				Log::logger->log("HTTPRESPONSE",ERROR) << "Can't write on socket: " << this->socket << " Error : " << strerror(errno) <<endl;
@@ -76,4 +76,27 @@ void HttpResponse::send() {
 		}
 	}
 	close(this->socket);	                		
+}
+
+int HttpResponse::write(const char * buffer, unsigned long size) {
+	fd_set write_flags; // the flag sets to be used
+    struct timeval waitd;          // the max wait time for an event
+    int sel;
+    waitd.tv_sec = 10;
+    FD_ZERO(&write_flags);
+    FD_SET(this->socket, &write_flags);
+    sel = select(this->socket+1, (fd_set*)0, &write_flags, (fd_set*)0, &waitd);
+    if(sel <= 0) {
+    	Log::logger->log("HTTPRESPONSE",DEBUG) << "Failed to wait select "<<sel <<endl;
+    	return -1;
+    }
+    if (FD_ISSET(this->socket, &write_flags)) {
+    	FD_CLR(socket, &write_flags);
+    	int ws=::write(this->socket, buffer, size);
+    	return ws;
+    } else {
+    	Log::logger->log("HTTPRESPONSE",DEBUG) << "Not sure it's possible to come here" <<endl;
+    	return -1;
+    }
+
 }
