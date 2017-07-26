@@ -1,6 +1,7 @@
 #include "httpresponse.h"
 #include <sstream>
 #include <unistd.h>
+#include <string.h>
 #include "log.h"
 
 
@@ -60,10 +61,13 @@ void HttpResponse::send() {
 	} else {
 		char * ptr=this->buffer;
 		unsigned int length=this->contentLength;
+		Log::logger->log("HTTPRESPONSE",DEBUG) << "Starting writing body." << endl;
 		while (length>0) {
+			Log::logger->log("HTTPRESPONSE",DEBUG) << "We have to write " << length << " bytes" <<endl;
 			ws=write(this->socket, ptr, length);
+			Log::logger->log("HTTPRESPONSE",DEBUG) << "We have writen " << ws << " bytes" <<endl;
 			if (ws<0) {
-				Log::logger->log("HTTPRESPONSE",ERROR) << "Can't write on socket: " << this->socket <<endl;
+				Log::logger->log("HTTPRESPONSE",ERROR) << "Can't write on socket: " << this->socket << " Error : " << strerror(errno) <<endl;
 				length=0;
 			} else {
 				length-=ws;
