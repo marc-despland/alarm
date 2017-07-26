@@ -81,6 +81,7 @@ class AlarmDaemon:public Daemon {
 					Log::logger->log("MAIN",ERROR) << "Unable to setup ISR: " << strerror (errno) << endl;
 					this->monitor=false;
 				}
+				start_httpd();
 			}
 			while (this->monitor) {
 				int now=(int) time(NULL);
