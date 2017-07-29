@@ -51,9 +51,10 @@ void SensorsBank::sendData(std::map<string,double> sensors) throw (CurlInitExcep
 		res = curl_easy_perform(curl);
 		if(res != CURLE_OK) {
 			Log::logger->log("SENSORSBANK",ERROR) << "Failed to send sensors data " << curl_easy_strerror(res) <<endl;
+			curl_easy_cleanup(curl);
 			throw PostException();
 		}
-
+		Log::logger->log("SENSORSBANK",DEBUG) << "Success" <<endl;
 		curl_easy_cleanup(curl);
 	} else {
 		Log::logger->log("SENSORSBANK",ERROR) << "Failed to init curl library " <<endl;

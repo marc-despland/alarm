@@ -43,9 +43,10 @@ void ImagesBank::upload(string collection, string filename, unsigned char * buff
 		res = curl_easy_perform(curl);
 		if(res != CURLE_OK) {
 			Log::logger->log("IMAGESBANK",ERROR) << "Failed to send image " << curl_easy_strerror(res) <<endl;
+			curl_easy_cleanup(curl);
 			throw UploadException();
 		}
-
+		Log::logger->log("IMAGESBANK",DEBUG) << "Success" <<endl;
 		curl_easy_cleanup(curl);
 	} else {
 		Log::logger->log("IMAGESBANK",ERROR) << "Failed to init curl library " <<endl;
