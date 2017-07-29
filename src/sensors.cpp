@@ -44,19 +44,20 @@ void * Sensors::run(void * sensors) {
 	unsigned int loop=0;
 	while (me->running) {
 		sleep(me->readinterval);
-		me->readSensors();
-		loop++;
-		if (loop>postloop) {
-			for (std::map<string, double>::iterator it=me->value.begin();it!=me->value.end(); it++) {
-				me->lastavg[it->first]=it->second/loop;
-				me->value[it->first]=0;
+		if (me->readSensors()) {
+			loop++;
+			if (loop>postloop) {
+				for (std::map<string, double>::iterator it=me->value.begin();it!=me->value.end(); it++) {
+					me->lastavg[it->first]=it->second/loop;
+					me->value[it->first]=0;
+				}
+				try {
+					SensorsBank::sendData(me->lastavg);
+				} catch(CurlInitException &e) {
+				} catch(PostException &e) {
+				}	
+				loop=0;
 			}
-			try {
-				SensorsBank::sendData(me->lastavg);
-			} catch(CurlInitException &e) {
-			} catch(PostException &e) {
-			}	
-			loop=0;
 		}
 	}
 	return NULL;
@@ -111,14 +112,17 @@ bool Sensors::readSensors() {
 		usleep(10000);
 		char buf[16];
 		if (read(file, buf, 16) == 16) {
-			this->value["Humidity"]		+= ((double)(buf[0]+ (255*buf[1]))/10);
-	    	this->value["Temperature"]	+= ((double)(buf[2]+ (255*buf[3]))/10);
-	        this->value["MQ-2"] 		+= ((double)(buf[4]+ (255*buf[5]))/10);
-	        this->value["MQ-4"]		 	+= ((double)(buf[6]+ (255*buf[7]))/10); 
-	        this->value["MQ-5"]			+= ((double)(buf[8]+ (255*buf[9]))/10);
-	        this->value["MQ-6"]			+= ((double)(buf[10]+ (255*buf[11]))/10);
-	        this->value["MQ-7"]			+= ((double)(buf[12]+ (255*buf[13]))/10);
-	        this->value["MQ-135"]		+= ((double)(buf[14]+ (255*buf[15]))/10);
+			double data[16];
+			for (int i=0;i<16;i++) data[i]=buf[i];
+			this->value["Humidity"]		+= (data[0]+ (255*data[1]))/10;
+	    	this->value["Temperature"]	+= (data[2]+ (255*data[3]))/10;
+	        this->value["MQ-2"] 		+= (data[4]+ (255*data[5]))/10;
+	        this->value["MQ-4"]		 	+= (data[6]+ (255*data[7]))/10; 
+	        this->value["MQ-5"]			+= (data[8]+ (255*data[9]))/10;
+	        this->value["MQ-6"]			+= (data[10]+ (255*data[11]))/10;
+	        this->value["MQ-7"]			+= (data[12]+ (255*data[13]))/10;
+	        this->value["MQ-135"]		+= (data[14] + (255*data[15]))/10;
+	        if (((data[2]+ (255*data[3]))/10) >60) Log::logger->log("SENSORS",DEBUG) << "Temperature too high : " << ((data[2]+ (255*data[3]))/10)<< endl;
 		} else {
 			result=false;
 		}
