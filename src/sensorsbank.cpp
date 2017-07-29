@@ -41,6 +41,7 @@ void SensorsBank::sendData(std::map<string,double> sensors) throw (CurlInitExcep
 	if(curl) {
 		string apikey="ApiKey: "+SensorsBank::ApiKey;
 		list = curl_slist_append(list, apikey.c_str());
+		list = curl_slist_append(list, "Content-Type: application/json");
 		list = curl_slist_append(list, "Expect:");
 		string url=SensorsBank::ApiUrl+"/sensors";
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());

@@ -52,6 +52,7 @@ void * Sensors::run(void * sensors) {
 				me->value[it->first]=0;
 			}
 			SensorsBank::sendData(me->lastavg);
+			loop=0;
 		}
 	}
 	return NULL;
@@ -69,6 +70,15 @@ Sensors::Sensors(unsigned int readinterval, unsigned int postinterval) {
 	this->value["MQ-6"]=0;
 	this->value["MQ-7"]=0;
 	this->value["MQ-135"]=0;
+	this->lastavg["Temperature"]=0;
+	this->lastavg["Humidity"]=0;
+	this->lastavg["MQ-2"]=0;
+	this->lastavg["MQ-4"]=0;
+	this->lastavg["MQ-5"]=0;
+	this->lastavg["MQ-6"]=0;
+	this->lastavg["MQ-7"]=0;
+	this->lastavg["MQ-135"]=0;
+
 }
 
 
