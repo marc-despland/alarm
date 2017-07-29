@@ -3,11 +3,9 @@
 
 #include <exception>
 #include <string>
+#include "curlwrapper.h"
 using namespace std;
 
-class CurlInitException: public exception {
-		const char* what();
-};
 
 class UploadException: public exception {
 		const char* what();
