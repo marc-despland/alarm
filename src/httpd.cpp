@@ -38,6 +38,7 @@ void * Httpd::run(void * httpd) {
 Httpd::Httpd(int port, ILightController * light) {
 	this->port=port;
 	this->light=light;
+	this->thread= (pthread_t *) malloc(sizeof(pthread_t));
 }
 
 
