@@ -51,7 +51,11 @@ void * Sensors::run(void * sensors) {
 				me->lastavg[it->first]=it->second/loop;
 				me->value[it->first]=0;
 			}
-			SensorsBank::sendData(me->lastavg);
+			try {
+				SensorsBank::sendData(me->lastavg);
+			} catch(CurlInitException &e) {
+			} catch(PostException &e) {
+			}	
 			loop=0;
 		}
 	}

@@ -12,7 +12,8 @@ string SensorsBank::toJson(std::map<string,double> sensors) {
 	char responsedate [80]; 
 	time (&rawtime);
 	timeinfo = localtime (&rawtime);
-	strftime (responsedate,80,"\"date\": \"%a, %d %b %Y %X %Z\"",timeinfo);
+	//2017-07-28T10:35:55.912Z
+	strftime (responsedate,80,"\"date\": \"%a-%m-%dT%H:%M:%S.000%Z\"",timeinfo);
 	std::stringstream json;
 	json << "{" <<endl;
 	json << "	"<< responsedate<<","<<endl;
