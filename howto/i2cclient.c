@@ -58,11 +58,24 @@ int main(int argc, char** argv) {
       // 1ms seems to be enough but it depends on what workload it has
       usleep(10000);
  
-      char buf[1];
-      if (read(file, buf, 1) == 1) {
-    int temp = (int) buf[0];
- 
-    printf("Received %d\n", temp);
+      char buf[2];
+      if (read(file, buf, 16) == 16) {
+	float hum = ((float)(buf[0]+ (255*buf[1]))/10);
+    	float temp = ((float)(buf[2]+ (255*buf[3]))/10);
+        float mq2 = ((float)(buf[4]+ (255*buf[5]))/10);
+        float mq4 = ((float)(buf[6]+ (255*buf[7]))/10); 
+        float mq5 = ((float)(buf[8]+ (255*buf[9]))/10);
+        float mq6 = ((float)(buf[10]+ (255*buf[11]))/10);
+        float mq7 = ((float)(buf[12]+ (255*buf[13]))/10);
+        float mq135 = ((float)(buf[14]+ (255*buf[15]))/10);
+    	printf("Humidity 	%f\n", hum);
+	printf("Temperature 	%f\n",temp);
+	printf("MQ-2		%f\n",mq2);
+	printf("MQ-4            %f\n",mq4);
+	printf("MQ-5            %f\n",mq5);
+	printf("MQ-6            %f\n",mq6);
+	printf("MQ-7            %f\n",mq7);
+	printf("MQ-135          %f\n",mq135);
       }
     }
  
