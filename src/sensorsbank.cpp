@@ -46,7 +46,9 @@ void SensorsBank::sendData(std::map<string,double> sensors) throw (CurlInitExcep
 		list = curl_slist_append(list, "Expect:");
 		string url=SensorsBank::ApiUrl+"/sensors";
 		curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, SensorsBank::toJson(sensors).c_str());
+		string data=SensorsBank::toJson(sensors);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, data.c_str());
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, data.length());
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, list);
 		res = curl_easy_perform(curl);
 		if(res != CURLE_OK) {
