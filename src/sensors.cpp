@@ -112,17 +112,29 @@ bool Sensors::readSensors() {
 		usleep(10000);
 		char buf[16];
 		if (read(file, buf, 16) == 16) {
-			double data[16];
-			for (int i=0;i<16;i++) data[i]=buf[i];
-			this->value["Humidity"]		+= (data[0]+ (255*data[1]))/10;
-	    	this->value["Temperature"]	+= (data[2]+ (255*data[3]))/10;
-	        this->value["MQ-2"] 		+= (data[4]+ (255*data[5]))/10;
-	        this->value["MQ-4"]		 	+= (data[6]+ (255*data[7]))/10; 
-	        this->value["MQ-5"]			+= (data[8]+ (255*data[9]))/10;
-	        this->value["MQ-6"]			+= (data[10]+ (255*data[11]))/10;
-	        this->value["MQ-7"]			+= (data[12]+ (255*data[13]))/10;
-	        this->value["MQ-135"]		+= (data[14] + (255*data[15]))/10;
-	        if (((data[2]+ (255*data[3]))/10) >60) Log::logger->log("SENSORS",DEBUG) << "Temperature too high : " << ((data[2]+ (255*data[3]))/10)<< endl;
+			double data[8];
+			data[0] = ((double) (buf[0]+ (255*buf[1])))/10;
+	    	data[1] = ((double) (buf[2]+ (255*buf[3])))/10;
+	        data[2] = ((double) (buf[4]+ (255*buf[5])))/10;
+	        data[3] = ((double) (buf[6]+ (255*buf[7])))/10; 
+	        data[4] = ((double) (buf[8]+ (255*buf[9])))/10;
+	        data[5] = ((double) (buf[10]+ (255*buf[11])))/10;
+	        data[6] = ((double) (buf[12]+ (255*buf[13])))/10;
+	        data[7] = ((double) (buf[14] + (255*buf[15])))/10;
+	        this->value["Humidity"]		+= data[0];
+	    	this->value["Temperature"]	+= data[1];
+	        this->value["MQ-2"] 		+= data[2];
+	        this->value["MQ-4"]		 	+= data[3];
+	        this->value["MQ-5"]			+= data[4];
+	        this->value["MQ-6"]			+= data[5];
+	        this->value["MQ-7"]			+= data[6];
+	        this->value["MQ-135"]		+= data[7];
+
+	        if (data[1] >60) {
+	        	Log::logger->log("SENSORS",DEBUG) << "Temperature too high : ";
+	        	for (int i=0;i<8;i++) Log::logger->log("SENSORS",DEBUG) << data[i] <<" \t";
+	        	Log::logger->log("SENSORS",DEBUG) << endl;	
+	        }
 		} else {
 			result=false;
 		}
