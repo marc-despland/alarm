@@ -131,7 +131,10 @@ bool Sensors::readSensors() {
 	        this->value["MQ-135"]		+= data[7];
 
 	        if (data[1] >60) {
-	        	Log::logger->log("SENSORS",DEBUG) << "Temperature too high : ";
+	        	Log::logger->log("SENSORS",DEBUG) << "Sensors Error Raw Data : ";
+	        	for (int i=0;i<16;i++) Log::logger->log("SENSORS",DEBUG) << buf[i] <<" \t";
+	        	Log::logger->log("SENSORS",DEBUG) << endl;	
+	        	Log::logger->log("SENSORS",DEBUG) << "Sensors Error Data : ";
 	        	for (int i=0;i<8;i++) Log::logger->log("SENSORS",DEBUG) << data[i] <<" \t";
 	        	Log::logger->log("SENSORS",DEBUG) << endl;	
 	        }
