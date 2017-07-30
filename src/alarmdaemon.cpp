@@ -10,7 +10,11 @@
 
 void AlarmDaemon::Initialize(string program, string version, string description) {
 	if (Daemon::me==NULL) {
-		Daemon::me=new AlarmDaemon(program, version, description);
+		AlarmDaemon * me=new AlarmDaemon(program, version, description);
+		Daemon::me=me;
+		me->program=program;
+		me->version=version;
+		me->description=description;
 	}
 }
 AlarmDaemon::~AlarmDaemon() {
@@ -59,7 +63,7 @@ void AlarmDaemon::daemon(){
 			Log::logger->log("ALARMDAEMON",ERROR) << "Unable to setup ISR: " << strerror (errno) << endl;
 			this->monitor=false;
 		}
-		Httpd::start(this->parameters->get("httpport")->asInt(), this);
+		Httpd::start(this->parameters->get("httpport")->asInt(), this, this);
 		Sensors::start(this->parameters->get("readinterval")->asInt(),this->parameters->get("postinterval")->asInt());
 	}
 	this->pause=false;
@@ -117,4 +121,29 @@ void AlarmDaemon::lightOff() {
 		digitalWrite(LED_PIN, 0);
 	}
 
+}
+
+string AlarmDaemon::jsonStatus() {
+	std::stringstream status;
+	status << "{" << endl;
+	status << "	\"program\": \""<<this->program<<"\","<<endl;
+	status << "	\"version\": \""<<this->version<<"\","<<endl;
+	status << "	\"description\": \""<<this->description<<"\","<<endl;
+	status << "	\"intrusion\": "<< this->stateon<<","<<endl;
+	status << "	\"pause\": "<< this->pause<<","<<endl;
+	status << "	\"sensors\": [" << endl;
+	status << "	]" << endl;
+	std::map<string, double> sensors=Sensors::data();
+	for (std::map<string, double>::iterator it=sensors.begin();it!=sensors.end(); it++) {
+		if (it!=sensors.begin()) {
+			status << ","<<endl;
+		}
+		status << "		{" <<endl;
+		status << "			\"name\": \"" << it->first<< "\"," <<endl;
+		status << "			\"value\": " << it->second <<endl;
+		status << "		}";
+	}
+	status <<endl;
+	status << "}" << endl;
+	return status.str();
 }

@@ -7,9 +7,9 @@ string Httpd::ApiKey="";
 
 Httpd * Httpd::me=NULL;
 
-void Httpd::start(int port, ILightController * light) throw (ThreadCreateException){
+void Httpd::start(int port, ILightController * light, IStatus * status) throw (ThreadCreateException){
 	if (Httpd::me==NULL) {
-		Httpd::me=new Httpd(port, light);
+		Httpd::me=new Httpd(port, light,status);
 		Httpd::me->running=true;
 		if(pthread_create(Httpd::me->thread, NULL, Httpd::run, Httpd::me)) {
 			Log::logger->log("HTTPD",ERROR) << "Can't create HTTPD thread " << strerror (errno) << endl;
@@ -32,13 +32,15 @@ void * Httpd::run(void * httpd) {
 	me->server=new HttpServer(me->port,20, true);
 	me->server->add(HTTP_GET, "/api/image", Httpd::captureLiveImage);
 	me->server->add(HTTP_GET, "/api/pause", Httpd::togglePause);
+	me->server->add(HTTP_GET, "/api/status", Httpd::getStatus);
 	me->server->run();
 	return NULL;
 }
 
-Httpd::Httpd(int port, ILightController * light) {
+Httpd::Httpd(int port, ILightController * light, IStatus * status) {
 	this->port=port;
 	this->light=light;
+	this->appstatus=status;
 	this->thread= (pthread_t *) malloc(sizeof(pthread_t));
 }
 
@@ -64,14 +66,41 @@ int Httpd::togglePause(HttpRequest * request, HttpResponse * response) {
 	} else {
 		Httpd * me=Httpd::me;
 		bool state=me->light->togglePause();
-		context->response->setStatusCode(200);
-		context->response->setStatusMessage("OK");
-		context->response->setContentType("application/json");
+		response->setStatusCode(200);
+		response->setStatusMessage("OK");
+		response->setContentType("application/json");
 		if (state) {
-			context->response->setBody("{\"pause\": true}", 15);
+			response->setBody("{\"pause\": true}", 15);
 		} else {
-			context->response->setBody("{\"pause\": false}", 16);
+			response->setBody("{\"pause\": false}", 16);
 		}
+		response->send();
+		delete response;
+		delete request;
+	}
+	return 0;
+}
+
+int Httpd::getStatus(HttpRequest * request, HttpResponse * response) {
+	string apikey="";
+	try {
+		apikey=request->getHeader("apikey");
+	} catch(std::out_of_range &e) {}
+	Httpd * me=Httpd::me;
+	if (apikey!=Httpd::ApiKey) {
+		Log::logger->log("HTTPD", DEBUG) << "Forbbiden request" <<endl;
+		response->setStatusCode(403);
+		response->setStatusMessage("FORBIDDEN");
+		response->send();
+		delete response;
+		delete request;
+	} else {
+		Httpd * me=Httpd::me;
+		string status=me->appstatus->jsonStatus();
+		response->setStatusCode(200);
+		response->setStatusMessage("OK");
+		response->setContentType("application/json");
+		response->setBody(status.c_str(), status.length());
 		response->send();
 		delete response;
 		delete request;

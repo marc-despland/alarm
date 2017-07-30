@@ -13,6 +13,7 @@ class Sensors {
 	public:
 		static void start(unsigned int readinterval, unsigned int postinterval) throw (ThreadCreateException);
 		static void stop();
+		static std::map<string, double> data();
 	protected:
 		static Sensors * me;
 		Sensors(unsigned int readinterval, unsigned int postinterval);

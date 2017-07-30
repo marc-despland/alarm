@@ -17,7 +17,9 @@ Sensors * Sensors::me=NULL;
 // The I2C bus: This is for V2 and V3 pi's. For V1 Model B you need i2c-0
 static const char *devName = "/dev/i2c-1";
 
-
+std::map<string, double> Sensors::data() {
+	return (Sensors::me->lastavg);
+}
 
 void Sensors::start(unsigned int readinterval, unsigned int postinterval) throw (ThreadCreateException){
 	if (Sensors::me==NULL) {

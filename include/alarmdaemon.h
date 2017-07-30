@@ -9,14 +9,16 @@
 #include "httpd.h"
 #include "sensors.h"
 #include "ilightcontroller.h"
+#include "istatus.h"
 
-class AlarmDaemon: public Daemon, ILightController {
+class AlarmDaemon: public Daemon, ILightController, IStatus {
 	public:
 		static void Initialize(string program, string version, string description);
 		~AlarmDaemon();
 		void lightOn();
 		void lightOff();
 		bool togglePause();
+		string jsonStatus();
 	protected:
 		int lastevent;
 		bool monitor;
@@ -26,6 +28,9 @@ class AlarmDaemon: public Daemon, ILightController {
 		void daemon();
 		void terminate();
 		static void Intrusion(void);
+		string program;
+		string version;
+		string description;
 };
 
 #endif

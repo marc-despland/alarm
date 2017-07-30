@@ -33,8 +33,8 @@ void HttpResponse::addCustomHeader(string name, string value) {
 	this->headers[name]=value;
 }
 
-void HttpResponse::setBody(char *buffer, unsigned long size) {
-	this->buffer=buffer;
+void HttpResponse::setBody(const char *buffer, unsigned long size) {
+	this->buffer=(char *) buffer;
 	this->contentLength=size;
 }
 

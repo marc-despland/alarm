@@ -14,7 +14,7 @@ class HttpResponse {
 		void setStatusCode(unsigned int value);
 		void setStatusMessage(string message);
 		void addCustomHeader(string name, string value);
-		void setBody(char *buffer, unsigned long size);
+		void setBody(const char *buffer, unsigned long size);
 		void send();
 	protected:
 		int write(const char * buffer, unsigned long size);
