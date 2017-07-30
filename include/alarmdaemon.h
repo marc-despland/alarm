@@ -16,12 +16,13 @@ class AlarmDaemon: public Daemon, ILightController {
 		~AlarmDaemon();
 		void lightOn();
 		void lightOff();
+		bool togglePause();
 	protected:
 		int lastevent;
 		bool monitor;
 		bool stateon;
 		AlarmDaemon(string program, string version, string description);
-
+		bool pause;
 		void daemon();
 		void terminate();
 		static void Intrusion(void);

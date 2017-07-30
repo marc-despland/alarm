@@ -31,6 +31,7 @@ void * Httpd::run(void * httpd) {
 	Log::logger->log("HTTPD",DEBUG) << "Sarting HTTPD server" <<endl;
 	me->server=new HttpServer(me->port,20, true);
 	me->server->add(HTTP_GET, "/api/image", Httpd::captureLiveImage);
+	me->server->add(HTTP_GET, "/api/pause", Httpd::togglePause);
 	me->server->run();
 	return NULL;
 }
@@ -44,6 +45,38 @@ Httpd::Httpd(int port, ILightController * light) {
 
 Httpd::~Httpd() {
 	free(this->thread);
+}
+
+
+int Httpd::togglePause(HttpRequest * request, HttpResponse * response) {
+	string apikey="";
+	try {
+		apikey=request->getHeader("apikey");
+	} catch(std::out_of_range &e) {}
+	Httpd * me=Httpd::me;
+	if (apikey!=Httpd::ApiKey) {
+		Log::logger->log("HTTPD", DEBUG) << "Forbbiden request" <<endl;
+		response->setStatusCode(403);
+		response->setStatusMessage("FORBIDDEN");
+		response->send();
+		delete response;
+		delete request;
+	} else {
+		Httpd * me=Httpd::me;
+		bool state=me->light->togglePause();
+		context->response->setStatusCode(200);
+		context->response->setStatusMessage("OK");
+		context->response->setContentType("application/json");
+		if (state) {
+			context->response->setBody("{\"pause\": true}", 15);
+		} else {
+			context->response->setBody("{\"pause\": false}", 16);
+		}
+		response->send();
+		delete response;
+		delete request;
+	}
+	return 0;
 }
 
 

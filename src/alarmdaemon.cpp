@@ -33,6 +33,7 @@ AlarmDaemon::AlarmDaemon(string program, string version, string description):Dae
 	} catch(ExistingParameterNameException &e ) {
 		Log::logger->log("ALARMDAEMON", EMERGENCY) << "Can't create one of the file parameters"<< endl;
 	}
+	this->pause=false;
 }
 
 void AlarmDaemon::daemon(){
@@ -61,11 +62,12 @@ void AlarmDaemon::daemon(){
 		Httpd::start(this->parameters->get("httpport")->asInt(), this);
 		Sensors::start(this->parameters->get("readinterval")->asInt(),this->parameters->get("postinterval")->asInt());
 	}
+	this->pause=false;
 	while (this->monitor) {
 		int now=(int) time(NULL);
 		if (lastevent+10<now) {
 			if (this->stateon) {
-				digitalWrite(LED_PIN, 0);
+				if (!this->pause) digitalWrite(LED_PIN, 0);
 				Capture::stop();
 				this->stateon=false;
 			}
@@ -83,7 +85,7 @@ void AlarmDaemon::terminate(){
 void AlarmDaemon::Intrusion(void) {
 	AlarmDaemon * me=(AlarmDaemon *) Daemon::me;
 	me->lastevent=(int) time(NULL);
-	if (!me->stateon) {
+	if ((!me->stateon) && (!me->pause)) {
 		digitalWrite(LED_PIN, 1);
 		Notify::notify(START_INTRUSION);
 		Capture::start();
@@ -91,6 +93,18 @@ void AlarmDaemon::Intrusion(void) {
 	}
 }
 
+
+bool AlarmDaemon::togglePause() {
+	AlarmDaemon * me=(AlarmDaemon *) Daemon::me;
+	if (me->pause) {
+		me->pause=false;
+		if (!me->stateon) digitalWrite(LED_PIN, 0);
+	} else {
+		me->pause=true;
+		digitalWrite(LED_PIN, 1);
+	}
+	return(me->pause);
+}
 
 void AlarmDaemon::lightOn() {
 	if (!this->stateon) {

@@ -10,7 +10,7 @@
 #include <unistd.h>
 #include "log.h"
 
-
+// db.sensor_Temperature.aggregate([{ $match: {"month": 6}},{$group: { _id: "$hours", temperature: { $avg : "$value" }}}]);
 Sensors * Sensors::me=NULL;
 #define ADDRESS 0x04
  
@@ -115,41 +115,25 @@ bool Sensors::readSensors() {
 			char crc=0;
 			for (int i=0;i<16;i++) crc=crc ^ buf[i];
 			if (crc==buf[16]) {
-				double data[8];
-				data[0] = ((double) (buf[0]+ (255*buf[1])))/10;
-		    	data[1] = ((double) (buf[2]+ (255*buf[3])))/10;
-		        data[2] = ((double) (buf[4]+ (255*buf[5])))/10;
-		        data[3] = ((double) (buf[6]+ (255*buf[7])))/10; 
-		        data[4] = ((double) (buf[8]+ (255*buf[9])))/10;
-		        data[5] = ((double) (buf[10]+ (255*buf[11])))/10;
-		        data[6] = ((double) (buf[12]+ (255*buf[13])))/10;
-		        data[7] = ((double) (buf[14] + (255*buf[15])))/10;
-		        this->value["Humidity"]		+= data[0];
-		    	this->value["Temperature"]	+= data[1];
-		        this->value["MQ-2"] 		+= data[2];
-		        this->value["MQ-4"]		 	+= data[3];
-		        this->value["MQ-5"]			+= data[4];
-		        this->value["MQ-6"]			+= data[5];
-		        this->value["MQ-7"]			+= data[6];
-		        this->value["MQ-135"]		+= data[7];
+		        this->value["Humidity"]		+= ((double) (buf[0]+ (255*buf[1])))/10;
+		    	this->value["Temperature"]	+= ((double) (buf[2]+ (255*buf[3])))/10;
+		        this->value["MQ-2"] 		+= ((double) (buf[4]+ (255*buf[5])))/10;
+		        this->value["MQ-4"]		 	+= ((double) (buf[6]+ (255*buf[7])))/10; 
+		        this->value["MQ-5"]			+= ((double) (buf[8]+ (255*buf[9])))/10;
+		        this->value["MQ-6"]			+= ((double) (buf[10]+ (255*buf[11])))/10;
+		        this->value["MQ-7"]			+= ((double) (buf[12]+ (255*buf[13])))/10;
+		        this->value["MQ-135"]		+= ((double) (buf[14] + (255*buf[15])))/10;
 
-		        if (data[1] >60) {
-		        	std::stringstream raw;
-		        	for (int i=0;i<16;i++) raw << (unsigned int) buf[i] <<" \t";
-		        	Log::logger->log("SENSORS",DEBUG) << "Sensors Error Raw Data : " << raw.str() << endl;
-
-		        	std::stringstream compute;
-		        	for (int i=0;i<8;i++) compute << data[i] <<" \t";
-		        	Log::logger->log("SENSORS",DEBUG) << "Sensors Error Data : " << compute.str() << endl;
-		        }
 		    } else {
 		    	Log::logger->log("SENSORS",DEBUG) << "Sensors Error Invalid CRC: " << (unsigned int) crc << " vs " << (unsigned int) buf[16] << endl;
 		    	result=false;
 		    }
 		} else {
+			Log::logger->log("SENSORS",DEBUG) << "Sensors Error we haven't read 17 bytes" << endl;
 			result=false;
 		}
 	} else {
+		Log::logger->log("SENSORS",DEBUG) << "Sensors Error cab't send teh command over I2C bus" << endl;
 		result=false;
 	}
 	close(file);

@@ -21,6 +21,7 @@ class Httpd {
 		Httpd(int port, ILightController * light);
 		~Httpd();
 		static void * run(void * httpd);
+		static int togglePause(HttpRequest * request, HttpResponse * response);
 		static int captureLiveImage(HttpRequest * request, HttpResponse * response);
 		static void * sendCapturedImage(void * params);
 		bool running;
