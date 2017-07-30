@@ -17,7 +17,7 @@
 
 int main(int argc, char **argv) {
 	Log::logger->setLevel(DEBUG);
-	AlarmDaemon::Initialize(argv[0], "1.0.0", "Alarm monitor with PIR mouvement detector");
+	AlarmDaemon::Initialize(argv[0], "1.3.0", "Alarm monitor with PIR mouvement detector");
 		//exit(0);
 
 	try {

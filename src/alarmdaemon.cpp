@@ -132,7 +132,6 @@ string AlarmDaemon::jsonStatus() {
 	status << "	\"intrusion\": "<< this->stateon<<","<<endl;
 	status << "	\"pause\": "<< this->pause<<","<<endl;
 	status << "	\"sensors\": [" << endl;
-	status << "	]" << endl;
 	std::map<string, double> sensors=Sensors::data();
 	for (std::map<string, double>::iterator it=sensors.begin();it!=sensors.end(); it++) {
 		if (it!=sensors.begin()) {
@@ -144,6 +143,7 @@ string AlarmDaemon::jsonStatus() {
 		status << "		}";
 	}
 	status <<endl;
+	status << "	]" << endl;
 	status << "}" << endl;
 	return status.str();
 }
