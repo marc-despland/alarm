@@ -21,8 +21,8 @@ int mq7;
 int mq135;
 #define SLAVE_ADDRESS 0x04
 int number = 0;
-byte data[16];
-  
+byte data[17];
+
 void setup() {
   pinMode(A0, INPUT);
   pinMode(A1, INPUT);
@@ -39,43 +39,61 @@ void setup() {
   Wire.onRequest(sendData);
   dht.begin();
 }
- 
+
 void loop() {
- delay(200);
- hum = (int) (10*dht.readHumidity());
- temp= (int) (10*dht.readTemperature());
- mq2= (int) (10*analogRead(A0));
- mq4= (int) (10*analogRead(A1));
- mq5= (int) (10*analogRead(A2));
- mq6= (int) (10*analogRead(A3));
- mq7= (int) (10*analogRead(A6));
- mq135= (int) (10*analogRead(A7));
- data[0]=hum;
- data[1]=hum >> 8;
- data[2]=temp;
- data[3]=temp >> 8; 
- data[4]=mq2;
- data[5]=mq2 >> 8; 
- data[6]=mq4;
- data[7]=mq4 >> 8; 
- data[8]=mq5;
- data[9]=mq5 >> 8; 
- data[10]=mq6;
- data[11]=mq6 >> 8; 
- data[12]=mq7;
- data[13]=mq7 >> 8; 
- data[14]=mq135;
- data[15]=mq135 >> 8; 
+  delay(200);
+  hum = (int) (10 * dht.readHumidity());
+  temp = (int) (10 * dht.readTemperature());
+  mq2 = (int) (10 * analogRead(A0));
+  mq4 = (int) (10 * analogRead(A1));
+  mq5 = (int) (10 * analogRead(A2));
+  mq6 = (int) (10 * analogRead(A3));
+  mq7 = (int) (10 * analogRead(A6));
+  mq135 = (int) (10 * analogRead(A7));
+  if (!isnan(hum)) {
+    data[0] = hum;
+    data[1] = hum >> 8;
+  }
+  if (!isnan(temp)) {
+    data[2] = temp;
+    data[3] = temp >> 8;
+  }
+  if (!isnan(mq2)) {
+    data[4] = mq2;
+    data[5] = mq2 >> 8;
+  }
+  if (!isnan(mq4)) {
+    data[6] = mq4;
+    data[7] = mq4 >> 8;
+  }
+  if (!isnan(mq5)) {
+    data[8] = mq5;
+    data[9] = mq5 >> 8;
+  }
+  if (!isnan(mq6)) {
+    data[10] = mq6;
+    data[11] = mq6 >> 8;
+  }
+  if (!isnan(mq7)) {
+    data[12] = mq7;
+    data[13] = mq7 >> 8;
+  }
+  if (!isnan(mq135)) {
+    data[14] = mq135;
+    data[15] = mq135 >> 8;
+  }
+  data[16] = 0;
+  for (int i = 0; i < 16; i++) data[16] = data[16] ^ data[i];
 }
- 
+
 // callback for received data
-void receiveData(int byteCount){
-  while(Wire.available()) {
+void receiveData(int byteCount) {
+  while (Wire.available()) {
     number = Wire.read();
   }
 }
- 
+
 // callback for sending data
-void sendData(){
-  Wire.write(data,16);
+void sendData() {
+  Wire.write(data, 17);
 }
