@@ -38,6 +38,14 @@ void setup() {
   Wire.onReceive(receiveData);
   Wire.onRequest(sendData);
   dht.begin();
+  hum = 0; //Stores humidity value
+  temp = 0; //Stores temperature value
+  mq2 = 0;
+  mq6 = 0;
+  mq5 = 0;
+  mq4 = 0;
+  mq7 = 0;
+  mq135 = 0;
 }
 
 void loop() {
