@@ -60,6 +60,7 @@ int HttpRequestParser::on_header_field(http_parser* parser, const char *at, size
 	char * value=(char *) malloc(sizeof(char)*(length+1));
 	memcpy( value, at, length );
 	value[length]='\0';
+	for (unsigned int i=0; i<length; i++) value[i]=tolower(value[i]);
 	me->header=value;
 	Log::logger->log("HTTPREQUESTPARSER", DEBUG) << "Header Field " << value << " length " << length<<endl;
 	free(value);
